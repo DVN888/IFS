@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
-  Menus, ComCtrls, Spin;
+  Menus, ComCtrls, Spin, Math;
 
 type
 
@@ -52,7 +52,7 @@ implementation
 //maybe keep track of if the point changed places and then end loop when no movement (attractor)
 
 const
-  ParticleNumber = 262144;
+  ParticleNumber = 260000;
   Dimensions = 3;  //dimensions of the particle space, currently 2
   glClearColor = $FFEEDD;
   glParticleShadingColor = $1357ff;
@@ -103,7 +103,7 @@ begin
     then str += 'Drawing...   ';
   if(str='')
     then str := 'Idle...   ';
-  Form1.Caption := str;
+  Form1.Caption := 'Press [s] for settings...   '+str;
 end;
 
 function getInverseColor(col:TColor):TColor;
@@ -122,23 +122,24 @@ begin
   Form1.SpinEditStep.Font.Color:=clBlack;
 end;
 
+function getDepthColor(val:REAL):TColor;
+//                  val is the value the color is dependant on
+const base = 0.10;  //0<base<1 prevents true black
+                   //base>=1 makes all particles have the shading color
+var z:REAL;
+    r,g,b:BYTE;
+begin
+  z := (max(-1,min(val,1))+1)/2; //z in [0,1]
+  z := max(z,min(max(base,0),1));              //z in [base,1]
+  r := round((glParticleShadingColor mod 256)*z);
+  g := round(((glParticleShadingColor DIV 256) mod 256)*z);
+  b := round(((glParticleShadingColor DIV (256*256)) mod 256)*z);
+  Result := r + 256*g + 256*256*b;
+end;
+
 //==============================================================================
 //       math stuff
 //------------------------------------------------------------------------------
-function min(v1,v2:REAL):REAL;
-begin
-  if(v1<v2)
-    then Result := v1
-    else Result := v2;
-end;
-
-function max(v1,v2:REAL):REAL;
-begin
-  if(v1>v2)
-    then Result := v1
-    else Result := v2;
-end;
-
 function getLargestAbsoluteEigenvalue(mat:tMatrix):REAL;
 var Re,Im:REAL;
 begin
@@ -157,22 +158,20 @@ begin
       mat[i][j] := mat[i][j]*scalar;
 end;
 
-function getDepthColor(val:REAL):TColor;
-//                  val is the value the color is dependant on
-const base = 0.10;  //0<base<1 prevents black
-                   //base>=1 makes all particles have the shading color
-var z:REAL;
-    r,g,b:BYTE;
+function MatrixMultiplication(left,right:tMatrix):tMatrix;
+var row,col,ind:BYTE;
+    mat:tMatrix;
 begin
-  z := (max(-1,min(val,1))+1)/2; //z in [0,1]
-  z := max(z,min(base,1));              //z in [base,1]
-  r := round((glParticleShadingColor mod 256)*z);
-  g := round(((glParticleShadingColor DIV 256) mod 256)*z);
-  b := round(((glParticleShadingColor DIV (256*256)) mod 256)*z);
-  Result := r + 256*g + 256*256*b;
+  for row := 1 to Dimensions+1 do
+    for col := 1 to Dimensions+1 do begin
+      //init to zero
+      mat[row][col]:=0.0;
+      //dot product of row and column vectors
+      for ind := 1 to Dimensions+1 do
+        mat[row][col] += left[row][ind]*right[ind][col];
+    end;
+  Result:=mat;
 end;
-
-//procedure multiplyMatrix()
 
 function getRandomParticle:tParticle;
 var res:tParticle;
@@ -196,25 +195,137 @@ begin
   globalArray := res;
 end;
 
-procedure setRandomMatrix(VAR mat:tMatrix);
+procedure setIdentity(VAR mat:tMatrix);
 var i,j:BYTE;
-const risk = 0.5;
 begin
-  for i := 1 to Dimensions do
-    for j := 1 to Dimensions+1 do                         //here soon factorization and multiply
-      mat[i][j] := 2*Random-1;
+  for i := 1 to Dimensions+1 do
+    for j := 1 to Dimensions+1 do
+      mat[i][j] := 0.0;
+  for i := 1 to Dimensions+1 do
+    mat[i][i] := 1.0;
+end;
+
+procedure setRandomTranslation(VAR mat:tMatrix);
+const radius = 1;
+var i:BYTE;
+    ran:REAL;
+begin
+  setIdentity(mat);
+  for i := 1 to Dimensions do begin
+    ran := (Random*2-1);
+    mat[i][Dimensions+1]:=sqrt(abs(ran))*sign(ran)*radius;
+  end;
+end;
+
+procedure setRandom3DShear(VAR mat:tMatrix);
+var bound:BYTE;
+    XY,XZ,YZ:tMatrix;
+begin
+  bound := min(Dimensions,3);
+  setIdentity(XY);
+  setIdentity(XZ);
+  setIdentity(YZ);
+
+  case bound of
+    0,1: ;
+      2: begin
+           XZ[1][2]:=Random-1;
+           YZ[2][1]:=Random-1;
+         end;
+      3: begin
+           XY[1][3]:=Random-1;
+           XY[2][3]:=Random-1;
+           XZ[1][2]:=Random-1;
+           XZ[3][2]:=Random-1;
+           YZ[2][1]:=Random-1;
+           YZ[3][1]:=Random-1;
+         end;
+  else   ShowMessage('There might be a problem (Random Shear Matrix)');
+  end;
+
+  mat:=MatrixMultiplication(YZ,MatrixMultiplication(XZ,XY));
+end;
+
+procedure setRandom3DRotation(VAR mat:tMatrix);
+var bound:BYTE;
+    x,y,z:tMatrix;
+    rx,ry,rz:REAL;
+begin
+  bound:=min(Dimensions,3);
+  setIdentity(mat);
+  setIdentity(x);
+  setIdentity(y);
+  setIdentity(z);
+  rx:=Random*2*Pi;
+  ry:=Random*2*Pi;
+  rz:=Random*2*Pi;
+
+  case bound of
+    0,1: ;
+      2: begin
+           z[1][1]:=cos(rz);
+           z[1][2]:=-sin(rz);
+           z[2][1]:=sin(rz);
+           z[2][2]:=cos(rz);
+         end;
+      3: begin
+           x[2][2]:=cos(rx);
+           x[2][3]:=-sin(rx);
+           x[3][2]:=sin(rx);
+           x[3][3]:=cos(rx);
+
+           y[3][3]:=cos(ry);
+           y[3][1]:=-sin(ry);
+           y[1][3]:=sin(ry);
+           y[1][1]:=cos(ry);
+
+           z[1][1]:=cos(rz);
+           z[1][2]:=-sin(rz);
+           z[2][1]:=sin(rz);
+           z[2][2]:=cos(rz);
+         end;
+  else   ShowMessage('There may be a problem (Random Rotation Matrix)');
+  end;
+
+  mat:=MatrixMultiplication(z,MatrixMultiplication(y,x));
+end;
+
+procedure setRandomScale(VAR mat,translation:tMatrix);
+const min = 0.7;
+      max = 0.7;
+var i:BYTE;
+    s:SHORTINT;
+begin
+  setIdentity(mat);
+  for i := 1 to Dimensions do begin
+    s:=sign(translation[i][Dimensions+1]);
+    if(s=0) then s:=1;
+    mat[i][i]:=s*(Random*(max-min)+min)*(1-abs(translation[i][Dimensions+1])/(1+abs(translation[i][Dimensions+1])));
+  end;
+end;
+
+procedure setRandomMatrix3D(VAR mat:tMatrix);
+var i:BYTE;
+    translation,shear,rotation,scale:tMatrix;
+begin
+  setRandomTranslation(translation);
+  setRandom3DShear(shear);
+  setRandom3DRotation(rotation);
+  setRandomScale(scale,translation);
+
+  mat:=MatrixMultiplication(scale,MatrixMultiplication(rotation,MatrixMultiplication(shear,translation)));
+
   for i := 1 to Dimensions do
     mat[Dimensions+1][i] := 0;
   mat[Dimensions+1][Dimensions+1] := 1;
-  scalarMultiplyBaseMatrix(mat,risk/getLargestAbsoluteEigenvalue(mat));
 end;
 
 procedure setRandomAllMatrices;
 begin
-  setRandomMatrix(glMatrix1);
-  setRandomMatrix(glMatrix2);
-  setRandomMatrix(glMatrix3);
-  setRandomMatrix(glMatrix4);
+  setRandomMatrix3D(glMatrix1);
+  setRandomMatrix3D(glMatrix2);
+  setRandomMatrix3D(glMatrix3);
+  setRandomMatrix3D(glMatrix4);
 end;
 
 procedure applyTransform(VAR p:tParticle);
@@ -224,7 +335,7 @@ var
   z:REAL;
   i,j:BYTE;
 begin
-  case Random(4) of                 //later choose from n Matrices
+  case Random(3) of                 //later choose from n Matrices
     0: begin
          mat := glMatrix1;
          //p.color:=clRed;
@@ -237,10 +348,10 @@ begin
          mat := glMatrix3;
          //p.color:=clLime;
        end;
-    3: begin
-         mat := glMatrix4;
-         //p.color:=clYellow;
-       end;
+    //3: begin
+    //     mat := glMatrix4;
+    //     //p.color:=clYellow;
+    //   end;
 
   end;
   //matrix multiplication
@@ -290,7 +401,7 @@ begin
   //c.Pixels[round(c.Width/2+sizeconstraint*p.x/2),round(c.Height/2-sizeconstraint*p.y/2)] := p.color;
   c.Brush.Color:=p.color;
   c.Pen.Color:=p.color;
-  c.Ellipse(round(c.Width/2+sizeconstraint*p.pos[1]/3)-1,round(c.Height/2-sizeconstraint*p.pos[2]/3)-1,round(c.Width/2+sizeconstraint*p.pos[1]/3)+1,round(c.Height/2-sizeconstraint*p.pos[2]/3)+1);
+  c.Ellipse(round(c.Width/2+sizeconstraint*p.pos[1])-1,round(c.Height/2-sizeconstraint*p.pos[2])-1,round(c.Width/2+sizeconstraint*p.pos[1])+1,round(c.Height/2-sizeconstraint*p.pos[2])+1);
 end;
 
 procedure DrawArray(a:tParticleArray; c:TCanvas);
@@ -313,7 +424,6 @@ end;
 procedure Init;
 begin
   CanvasFillWithColor(Form1.Canvas,glClearColor);
-  setRandomParticleArray;
   setRandomAllMatrices;
   glIterCount:=0;
   glmsTimeLog:=0;
@@ -335,8 +445,8 @@ begin
   Form1.Button1.Enabled:=true;
   Form1.Button2.Enabled:=true;
   Form1.Button3.Enabled:=true;
-  Form1.ButtonStep.Enabled:=false;
-  Form1.ButtonCombo.Enabled:=false;
+  Form1.ButtonStep.Enabled:=true;
+  Form1.ButtonCombo.Enabled:=true;
 end;
 
 { TForm1 }
@@ -356,16 +466,18 @@ begin
   glIsLimited:=false;
   setFontColor;
   UpdateForm1Caption;
+  setRandomParticleArray;
+
 end;
 
 procedure TForm1.FormResize(Sender: TObject);
 begin
   UpdateLabels;
   setFontColor;
-  Form1.ButtonStep.Top:=Form1.Height-10-Form1.ButtonStep.Height;
-  Form1.SpinEditStep.Top:=Form1.ButtonStep.Top+(Form1.ButtonStep.Height-Form1.SpinEditStep.Height) DIV 2;
-  Form1.ButtonCombo.Left:=Form1.Width-10-Form1.ButtonCombo.Width;
   Form1.ButtonCombo.Top:=Form1.Height-10-Form1.ButtonCombo.Height;
+  Form1.SpinEditStep.Top:=Form1.ButtonCombo.Top+(Form1.ButtonCombo.Height-Form1.SpinEditStep.Height) DIV 2;
+  //Form1.ButtonCombo.Left:=Form1.Width-10-Form1.ButtonCombo.Width;
+  Form1.ButtonStep.Top:=Form1.Height-20-Form1.ButtonCombo.Height-Form1.ButtonStep.Height;
 end;
 
 procedure TForm1.TimerComputeStartTimer(Sender: TObject);

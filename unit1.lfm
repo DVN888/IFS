@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 1730
+  Left = 1729
   Height = 256
-  Top = 874
+  Top = 822
   Width = 683
   Caption = 'Form1'
   ClientHeight = 256
@@ -78,7 +78,7 @@ object Form1: TForm1
     OnClick = ButtonStepClick
   end
   object SpinEditStep: TSpinEdit
-    Left = 140
+    Left = 160
     Height = 38
     Top = 209
     Width = 75
@@ -90,12 +90,12 @@ object Form1: TForm1
     MaxValue = 100
     ParentFont = False
     TabOrder = 4
-    Value = 10
+    Value = 15
   end
   object ButtonCombo: TButton
-    Left = 528
+    Left = 10
     Height = 40
-    Top = 200
+    Top = 160
     Width = 140
     Caption = 'New + n Steps'
     TabOrder = 5

@@ -1,0 +1,303 @@
+object Form2: TForm2
+  Left = 1728
+  Height = 640
+  Top = 510
+  Width = 705
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsDialog
+  Caption = 'Form2'
+  ClientHeight = 640
+  ClientWidth = 705
+  Color = clGradientActiveCaption
+  DesignTimePPI = 144
+  PopupMode = pmExplicit
+  LCLVersion = '4.6.0.0'
+  Visible = True
+  OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
+  OnResize = FormResize
+  object LabelCount: TLabel
+    Left = 120
+    Height = 21
+    Top = 30
+    Width = 9
+    Caption = '0'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clLime
+    Font.Height = -16
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Layout = tlCenter
+    ParentFont = False
+  end
+  object LabelTime: TLabel
+    Left = 120
+    Height = 21
+    Top = 9
+    Width = 184
+    Caption = 'Latest Draw Time: 4444ms'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clLime
+    Font.Height = -16
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Layout = tlCenter
+    ParentFont = False
+  end
+  object Button1: TButton
+    Left = 10
+    Height = 40
+    Top = 10
+    Width = 100
+    Caption = 'Turn On'
+    TabOrder = 0
+    OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 10
+    Height = 40
+    Top = 60
+    Width = 100
+    Caption = 'New Thing'
+    TabOrder = 1
+    OnClick = Button2Click
+  end
+  object Button3: TButton
+    Left = 10
+    Height = 40
+    Top = 110
+    Width = 100
+    Caption = 'Draw'
+    TabOrder = 2
+    OnClick = Button3Click
+  end
+  object ButtonCombo: TButton
+    Left = 10
+    Height = 40
+    Top = 210
+    Width = 140
+    Caption = 'New + n Steps'
+    TabOrder = 3
+    OnClick = ButtonComboClick
+  end
+  object ButtonStep: TButton
+    Left = 10
+    Height = 40
+    Top = 160
+    Width = 120
+    Caption = 'Do n Steps'
+    TabOrder = 4
+    OnClick = ButtonStepClick
+  end
+  object SpinEditStep: TSpinEdit
+    Left = 160
+    Height = 38
+    Top = 211
+    Width = 75
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clLime
+    Font.Height = -22
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    MaxValue = 100
+    ParentFont = False
+    TabOrder = 5
+    Value = 15
+  end
+  object ArrowRight: TArrow
+    Left = 225
+    Height = 40
+    Top = 95
+    Width = 40
+    ArrowType = atRight
+    Constraints.MinHeight = 12
+    Constraints.MinWidth = 12
+    OnClick = ArrowRightClick
+  end
+  object ArrowLeft: TArrow
+    Left = 145
+    Height = 40
+    Top = 95
+    Width = 40
+    Constraints.MinHeight = 12
+    Constraints.MinWidth = 12
+    OnClick = ArrowLeftClick
+  end
+  object ArrowUp: TArrow
+    Left = 185
+    Height = 40
+    Top = 55
+    Width = 40
+    ArrowType = atUp
+    Constraints.MinHeight = 12
+    Constraints.MinWidth = 12
+    OnClick = ArrowUpClick
+  end
+  object ArrowDown: TArrow
+    Left = 185
+    Height = 40
+    Top = 135
+    Width = 40
+    ArrowType = atDown
+    Constraints.MinHeight = 12
+    Constraints.MinWidth = 12
+    OnClick = ArrowDownClick
+  end
+  object ButtonMatrix: TButton
+    Left = 285
+    Height = 35
+    Hint = 'Show Matrices...'
+    Top = 10
+    Width = 35
+    Caption = '>'
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 6
+    OnClick = ButtonMatrixClick
+  end
+  object ButtonReset: TButton
+    Left = 285
+    Height = 35
+    Top = 215
+    Width = 35
+    Caption = '↺'
+    TabOrder = 7
+    OnClick = ButtonResetClick
+  end
+  object ButtonResetVertical: TButton
+    Left = 285
+    Height = 35
+    Top = 180
+    Width = 35
+    Caption = '↕'
+    TabOrder = 8
+    OnClick = ButtonResetVerticalClick
+  end
+  object ButtonResetHorizontal: TButton
+    Left = 250
+    Height = 35
+    Top = 215
+    Width = 35
+    Caption = '↔'
+    TabOrder = 9
+    OnClick = ButtonResetHorizontalClick
+  end
+  object ListBoxMatrix: TListBox
+    Left = 331
+    Height = 580
+    Top = 50
+    Width = 365
+    Font.CharSet = ANSI_CHARSET
+    Font.Height = -16
+    Font.Name = 'Courier New'
+    Font.Pitch = fpFixed
+    Font.Quality = fqDraft
+    ItemHeight = 0
+    ParentFont = False
+    TabOrder = 10
+  end
+  object ButtonRenderLoop: TButton
+    Left = 10
+    Height = 40
+    Top = 260
+    Width = 310
+    Caption = 'Superdooperrendering'
+    TabOrder = 11
+    OnClick = ButtonRenderLoopClick
+  end
+  object LabelCam: TLabel
+    Left = 185
+    Height = 30
+    Top = 95
+    Width = 40
+    Alignment = taCenter
+    AutoSize = False
+    Caption = '📷'
+    Font.CharSet = ANSI_CHARSET
+    Font.Height = -28
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Layout = tlCenter
+    ParentFont = False
+  end
+  object ButtonZoomIn: TButton
+    Left = 285
+    Height = 30
+    Top = 70
+    Width = 35
+    Caption = 'In'
+    TabOrder = 12
+    OnClick = ButtonZoomInClick
+  end
+  object ButtonZoomReset: TButton
+    Left = 285
+    Height = 30
+    Top = 100
+    Width = 35
+    Caption = '↺'
+    TabOrder = 13
+    OnClick = ButtonZoomResetClick
+  end
+  object ButtonZoomOut: TButton
+    Left = 285
+    Height = 30
+    Top = 130
+    Width = 35
+    Caption = 'Out'
+    TabOrder = 14
+    OnClick = ButtonZoomOutClick
+  end
+  object LabelZoom: TLabel
+    Left = 285
+    Height = 16
+    Top = 54
+    Width = 35
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 'Zoom'
+    Font.CharSet = ANSI_CHARSET
+    Font.Height = -14
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Layout = tlBottom
+    ParentFont = False
+  end
+  object ButtonOrderMatrix: TButton
+    Left = 331
+    Height = 35
+    Top = 10
+    Width = 365
+    Caption = 'Print Matrices'
+    TabOrder = 15
+    OnClick = ButtonOrderMatrixClick
+  end
+  object LabelDVN: TLabel
+    Left = 0
+    Height = 25
+    Top = 615
+    Width = 53
+    Caption = '©DVN'
+  end
+  object TimerCompute: TTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = TimerComputeTimer
+    OnStartTimer = TimerComputeStartTimer
+    OnStopTimer = TimerComputeStopTimer
+    Left = 152
+    Top = 328
+  end
+  object TimerRender: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = TimerRenderTimer
+    Left = 120
+    Top = 440
+  end
+  object TimerNew: TTimer
+    Interval = 5555
+    OnTimer = TimerNewTimer
+    Left = 120
+    Top = 544
+  end
+end

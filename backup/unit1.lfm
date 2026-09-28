@@ -1,113 +1,24 @@
 object Form1: TForm1
-  Left = 1729
-  Height = 256
-  Top = 822
+  Left = 1724
+  Height = 399
+  Top = 161
   Width = 683
-  Caption = 'Form1'
-  ClientHeight = 256
+  Caption = 'Press [s] for settings...'
+  ClientHeight = 399
   ClientWidth = 683
   Color = clMenuHighlight
   DesignTimePPI = 144
   Font.Color = clLime
   LCLVersion = '4.6.0.0'
+  OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnResize = FormResize
-  object Button1: TButton
-    Left = 10
-    Height = 40
-    Top = 10
-    Width = 100
-    Caption = 'Turn On'
-    TabOrder = 0
-    OnClick = Button1Click
-  end
-  object Button2: TButton
-    Left = 10
-    Height = 40
-    Top = 60
-    Width = 100
-    Caption = 'New Thing'
-    TabOrder = 1
-    OnClick = Button2Click
-  end
-  object Button3: TButton
-    Left = 10
-    Height = 40
-    Top = 110
-    Width = 100
-    Caption = 'Draw'
-    TabOrder = 2
-    OnClick = Button3Click
-  end
-  object LabelCount: TLabel
-    Left = 120
-    Height = 32
-    Top = 20
-    Width = 13
-    Caption = '0'
-    Font.CharSet = ANSI_CHARSET
-    Font.Color = clLime
-    Font.Height = -24
-    Font.Pitch = fpVariable
-    Font.Quality = fqDraft
-    Layout = tlCenter
-    ParentFont = False
-  end
-  object LabelTime: TLabel
-    Left = 424
-    Height = 30
-    Top = 0
-    Width = 190
-    AutoSize = False
-    Caption = 'Latest Draw Time: 4444ms'
-    Font.CharSet = ANSI_CHARSET
-    Font.Color = clLime
-    Font.Height = -16
-    Font.Pitch = fpVariable
-    Font.Quality = fqDraft
-    Layout = tlCenter
-    ParentFont = False
-  end
-  object ButtonStep: TButton
-    Left = 10
-    Height = 40
-    Top = 208
-    Width = 120
-    Caption = 'Do n Steps'
-    TabOrder = 3
-    OnClick = ButtonStepClick
-  end
-  object SpinEditStep: TSpinEdit
-    Left = 160
-    Height = 38
-    Top = 209
-    Width = 75
-    Font.CharSet = ANSI_CHARSET
-    Font.Color = clLime
-    Font.Height = -22
-    Font.Pitch = fpVariable
-    Font.Quality = fqDraft
-    MaxValue = 100
-    ParentFont = False
-    TabOrder = 4
-    Value = 15
-  end
-  object ButtonCombo: TButton
-    Left = 10
-    Height = 40
+  object PaintBox: TPaintBox
+    Left = 152
+    Height = 100
     Top = 160
-    Width = 140
-    Caption = 'New + n Steps'
-    TabOrder = 5
-    OnClick = ButtonComboClick
-  end
-  object TimerCompute: TTimer
-    Enabled = False
-    Interval = 20
-    OnTimer = TimerComputeTimer
-    OnStartTimer = TimerComputeStartTimer
-    OnStopTimer = TimerComputeStopTimer
-    Left = 600
-    Top = 80
+    Width = 100
+    OnPaint = PaintBoxPaint
   end
 end
